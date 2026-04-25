@@ -1,4 +1,4 @@
-name: SmartCity-Emergency-Dispatch
+name: eme_enviro
 version: "1.0.0"
 description: >
   A disaster management reinforcement learning environment where agents manage
