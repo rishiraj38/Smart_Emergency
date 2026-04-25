@@ -84,95 +84,121 @@ def tasks():
     }
 @app.post("/grader")
 def grader():
+    """Grade the completed episode. Call after done=True."""
     if not _env.done:
-        remaining = len(_env.calls) - _env.call_index
-        raise HTTPException(400, 
-            f"Episode not complete. {remaining} calls remaining.")
+        active = sum(1 for e in _env.event_queue if e["status"] != "resolved")
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Episode not complete. "
+                f"Active events: {active}, "
+                f"Calls remaining: {len(_env.calls) - _env.call_index}. "
+                "Keep calling POST /step until obs.done == true."
+            ),
+        )
+
+    total_events = max(1, len(_env.event_queue))
+    fix_rate = round(_env.cases_resolved / total_events, 4)
+    score = round(max(0.0, min(1.0, fix_rate - (_env.critical_failures * 0.2))), 4)
+
     return {
-        "score": round(max(0.0, min(1.0, 
-            _env.cumulative_reward / max(1, _env.step_count * 10))), 4),
+        "score": score,
+        "fix_rate": fix_rate,
         "cases_resolved": _env.cases_resolved,
+        "total_events": total_events,
         "critical_failures": _env.critical_failures,
         "total_steps": _env.step_count,
-        "cumulative_reward": _env.cumulative_reward,
+        "cumulative_reward": round(_env.cumulative_reward, 4),
+        "episode_id": _env.episode_id,
+        "task_id": _env.task_id,
     }
 
 @app.get("/baseline")
 def baseline():
-    """Run rule-based agent against all 3 tasks."""
-    from environment import EmergencyDispatchEnvironment
-    
+    """Run rule-based agent on all 3 tasks. Required for hackathon."""
+    from server.environment import EmergencyDispatchEnvironment
+    from models import EmergencyAction
+
+    def classify_transcript(transcript: str) -> str:
+        t = (transcript or "").lower()
+        if any(w in t for w in ["fire", "flames", "smoke", "explosion", "gas", "burning"]):
+            return "CRITICAL"
+        if any(w in t for w in ["dying", "dead", "not breathing", "heart", "blood",
+                                 "unconscious", "screaming"]):
+            return "CRITICAL"
+        if any(w in t for w in ["hurt", "injured", "crash", "accident", "pain",
+                                 "trapped", "serious"]):
+            return "SEMI_CRITICAL"
+        return "NORMAL"
+
     def rule_agent(obs: dict) -> dict:
-        transcript = (obs.get("transcript") or "").lower()
+        transcript = obs.get("transcript") or ""
         current_call_id = obs.get("current_call_id")
-        active_events = obs.get("active_events", [])
+        events = obs.get("active_events", [])
         resources = obs.get("resources", [])
-        
-        # If there's a call to classify
+        prefix_map = {"ambulance": "AMB", "fire_truck": "FIRE", "police": "POL"}
+
+        # Priority 1: Dispatch to any unserved event (especially critical ones first)
+        priority = {"CRITICAL": 0, "SEMI_CRITICAL": 1, "NORMAL": 2}
+        for event in sorted(events, key=lambda e: priority.get(e.get("severity", "NORMAL"), 2)):
+            if event.get("status") != "unserved":
+                continue
+            prefix = prefix_map.get(event.get("resource_needed", "ambulance"), "AMB")
+            for v in resources:
+                if v["status"] == "available" and v["vehicle_id"].startswith(prefix):
+                    return {
+                        "command": "DISPATCH",
+                        "vehicle_id": v["vehicle_id"],
+                        "event_id": event["event_id"],
+                    }
+
+        # Priority 2: Classify incoming call
         if current_call_id and transcript:
-            if any(w in transcript for w in ["fire", "gas", "explosion", "smoke"]):
-                severity = "CRITICAL"
-            elif any(w in transcript for w in ["dying", "blood", "accident", "heart"]):
-                severity = "CRITICAL"
-            elif any(w in transcript for w in ["hurt", "injured", "crash"]):
-                severity = "SEMI_CRITICAL"
-            else:
-                severity = "NORMAL"
-            return {"command": "CLASSIFY", "severity": severity}
-        
-        # If there are unserved events, dispatch
-        for event in active_events:
-            if event["status"] == "unserved":
-                eid = event["event_id"]
-                needed = event.get("resource_needed", "ambulance")
-                prefix_map = {
-                    "ambulance": "AMB", 
-                    "fire_truck": "FIRE", 
-                    "police": "POL"
-                }
-                prefix = prefix_map.get(needed, "AMB")
-                for v in resources:
-                    if v["status"] == "available" and v["vehicle_id"].startswith(prefix):
-                        return {
-                            "command": "DISPATCH",
-                            "vehicle_id": v["vehicle_id"],
-                            "event_id": eid
-                        }
+            return {
+                "command": "CLASSIFY",
+                "severity": classify_transcript(transcript),
+            }
+
         return {"command": "WAIT"}
-    
-    env = EmergencyDispatchEnvironment()
-    scores = {}
-    
+
+    all_scores = {}
     for task_id in [1, 2, 3]:
+        env = EmergencyDispatchEnvironment()
         obs = env.reset(task_id=task_id).model_dump()
-        total_reward = 0
         steps = 0
-        while not obs.get("done", False) and steps < 200:
+        while not obs.get("done", False) and steps < 500:
             action_dict = rule_agent(obs)
-            from models import EmergencyAction
-            action = EmergencyAction(**action_dict)
-            result = env.step(action).model_dump()
-            obs = result["observation"]
-            total_reward += result["reward"]
+            try:
+                result = env.step(EmergencyAction(**action_dict)).model_dump()
+                obs = result["observation"]
+            except Exception:
+                break
             steps += 1
-        
-        scores[f"task_{task_id}"] = {
-            "score": round(env.cases_resolved / max(1, steps) * 10, 4),
+
+        total = max(1, len(env.event_queue))
+        fix_rate = round(env.cases_resolved / total, 4)
+        score = round(max(0.0, min(1.0, fix_rate - env.critical_failures * 0.2)), 4)
+
+        all_scores[f"task_{task_id}"] = {
+            "score": score,
+            "fix_rate": fix_rate,
             "cases_resolved": env.cases_resolved,
+            "critical_failures": env.critical_failures,
             "steps": steps,
-            "difficulty": ["easy", "medium", "hard"][task_id - 1]
+            "difficulty": ["easy", "medium", "hard"][task_id - 1],
         }
-    
-    avg = sum(v["score"] for v in scores.values()) / 3
+
+    avg = round(sum(v["score"] for v in all_scores.values()) / 3, 4)
     return {
         "baseline_agent": "rule-based keyword heuristics",
-        "average_score": round(avg, 4),
-        "tasks": scores
+        "average_score": avg,
+        "tasks": all_scores,
     }
+
 
 def main():
     import uvicorn
-    uvicorn.run("server.app:app", host="0.0.0.0", port=8000, log_level="info")
+    uvicorn.run("server.app:app", host="0.0.0.0", port=7860, log_level="info")
 
 if __name__ == "__main__":
     main()
