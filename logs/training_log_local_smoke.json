@@ -1,0 +1,182 @@
+[
+  {
+    "episode": 0,
+    "total_reward": -4.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 1,
+    "total_reward": 156.0,
+    "cases_resolved": 9,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 2,
+    "total_reward": 95.0,
+    "cases_resolved": 9,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 3,
+    "total_reward": 83.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 4,
+    "total_reward": -23.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 5,
+    "total_reward": 10.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 6,
+    "total_reward": 188.0,
+    "cases_resolved": 8,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 7,
+    "total_reward": 222.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 8,
+    "total_reward": -157.0,
+    "cases_resolved": 9,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 9,
+    "total_reward": 99.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 54,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 10,
+    "total_reward": 157.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 11,
+    "total_reward": 13.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 12,
+    "total_reward": 298.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 53,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 13,
+    "total_reward": 192.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 14,
+    "total_reward": -86.0,
+    "cases_resolved": 9,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 15,
+    "total_reward": 171.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 52,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 16,
+    "total_reward": 166.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 17,
+    "total_reward": 126.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 18,
+    "total_reward": 324.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 51,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  },
+  {
+    "episode": 19,
+    "total_reward": 275.0,
+    "cases_resolved": 10,
+    "critical_failures": 0,
+    "steps": 50,
+    "train_accuracy": 0.9998437762260437,
+    "eval_accuracy": 0.9981250166893005
+  }
+]

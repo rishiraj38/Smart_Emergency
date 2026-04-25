@@ -1,0 +1,702 @@
+[
+  {
+    "episode": 0,
+    "total_reward": -1826.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 1,
+    "total_reward": -1480.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 2,
+    "total_reward": -1511.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 3,
+    "total_reward": -1718.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 4,
+    "total_reward": -2936.0,
+    "cases_resolved": 4,
+    "critical_failures": 0,
+    "steps": 80
+  },
+  {
+    "episode": 5,
+    "total_reward": -2244.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 6,
+    "total_reward": -1268.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 40
+  },
+  {
+    "episode": 7,
+    "total_reward": -1858.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 8,
+    "total_reward": -1724.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 9,
+    "total_reward": -1665.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 10,
+    "total_reward": -1633.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 11,
+    "total_reward": -1409.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 12,
+    "total_reward": -1523.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 13,
+    "total_reward": -1498.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 40
+  },
+  {
+    "episode": 14,
+    "total_reward": -1780.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 15,
+    "total_reward": -1474.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 16,
+    "total_reward": -2007.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 17,
+    "total_reward": -1761.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 18,
+    "total_reward": -1745.0,
+    "cases_resolved": 1,
+    "critical_failures": 1,
+    "steps": 46
+  },
+  {
+    "episode": 19,
+    "total_reward": -1413.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 20,
+    "total_reward": -1223.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 21,
+    "total_reward": -1429.0,
+    "cases_resolved": 1,
+    "critical_failures": 1,
+    "steps": 48
+  },
+  {
+    "episode": 22,
+    "total_reward": -1270.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 23,
+    "total_reward": -1307.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 24,
+    "total_reward": -1110.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 25,
+    "total_reward": -1518.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 26,
+    "total_reward": -1291.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 27,
+    "total_reward": -1341.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 28,
+    "total_reward": -1431.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 29,
+    "total_reward": -1311.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 34
+  },
+  {
+    "episode": 30,
+    "total_reward": -1693.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 31,
+    "total_reward": -1408.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 32,
+    "total_reward": -1668.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 34
+  },
+  {
+    "episode": 33,
+    "total_reward": -1181.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 34,
+    "total_reward": -1028.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 35,
+    "total_reward": -1615.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 36,
+    "total_reward": -1394.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 40
+  },
+  {
+    "episode": 37,
+    "total_reward": -1729.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 38,
+    "total_reward": -2025.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 39,
+    "total_reward": -1614.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 39
+  },
+  {
+    "episode": 40,
+    "total_reward": -1018.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 41,
+    "total_reward": -1260.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 42,
+    "total_reward": -1926.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 43,
+    "total_reward": -1234.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 44,
+    "total_reward": -1815.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 45,
+    "total_reward": -1538.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 46,
+    "total_reward": -975.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 39
+  },
+  {
+    "episode": 47,
+    "total_reward": -1290.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 48,
+    "total_reward": -981.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 49,
+    "total_reward": -1616.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 50,
+    "total_reward": -1761.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 51,
+    "total_reward": -1259.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 52,
+    "total_reward": -1290.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 53,
+    "total_reward": -1474.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 54,
+    "total_reward": -1634.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 55,
+    "total_reward": -1683.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 56,
+    "total_reward": -1548.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 57,
+    "total_reward": -1424.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 58,
+    "total_reward": -1829.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 59,
+    "total_reward": -1632.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 60,
+    "total_reward": -1618.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 61,
+    "total_reward": -1341.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 62,
+    "total_reward": -1340.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 63,
+    "total_reward": -1467.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 64,
+    "total_reward": -1360.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 42
+  },
+  {
+    "episode": 65,
+    "total_reward": -1565.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 66,
+    "total_reward": -1686.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 41
+  },
+  {
+    "episode": 67,
+    "total_reward": -1286.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 68,
+    "total_reward": -1555.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 69,
+    "total_reward": -1542.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 70,
+    "total_reward": -1664.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 37
+  },
+  {
+    "episode": 71,
+    "total_reward": -1836.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 72,
+    "total_reward": -1351.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 73,
+    "total_reward": -1154.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 36
+  },
+  {
+    "episode": 74,
+    "total_reward": -1614.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 38
+  },
+  {
+    "episode": 75,
+    "total_reward": -1831.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 76,
+    "total_reward": -1236.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 77,
+    "total_reward": -1260.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 78,
+    "total_reward": -1461.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 79,
+    "total_reward": -1491.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 80,
+    "total_reward": -1297.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 81,
+    "total_reward": -1653.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 82,
+    "total_reward": -1516.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 83,
+    "total_reward": -1352.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 84,
+    "total_reward": -1432.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 85,
+    "total_reward": -1478.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 86,
+    "total_reward": -1710.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 87,
+    "total_reward": -1616.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 88,
+    "total_reward": -1552.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 89,
+    "total_reward": -1576.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 90,
+    "total_reward": -2429.0,
+    "cases_resolved": 4,
+    "critical_failures": 0,
+    "steps": 80
+  },
+  {
+    "episode": 91,
+    "total_reward": -1502.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 34
+  },
+  {
+    "episode": 92,
+    "total_reward": -1492.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 37
+  },
+  {
+    "episode": 93,
+    "total_reward": -1420.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 33
+  },
+  {
+    "episode": 94,
+    "total_reward": -1808.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 95,
+    "total_reward": -1870.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 35
+  },
+  {
+    "episode": 96,
+    "total_reward": -1540.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 31
+  },
+  {
+    "episode": 97,
+    "total_reward": -1585.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 98,
+    "total_reward": -1204.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  },
+  {
+    "episode": 99,
+    "total_reward": -1724.0,
+    "cases_resolved": 0,
+    "critical_failures": 1,
+    "steps": 32
+  }
+]
