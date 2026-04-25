@@ -265,7 +265,6 @@ class EmergencyDispatchEnvironment:
                 "steps_waiting": 0,
                 "status": "unserved",
             })
-            self.reward_calc.add_waiting_event(gt_event, severity)
             self._ground_truth[gt_event] = {
                 "severity": gt_severity,
                 "node": call["ground_truth_node"],
