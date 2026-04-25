@@ -1,8 +1,8 @@
 ---
-title: Emergency Service Rl Environment Server
-emoji: 📼
-colorFrom: gray
-colorTo: purple
+title: Smart Emergency Environment Server
+emoji: 🎯
+colorFrom: pink
+colorTo: blue
 sdk: docker
 pinned: false
 app_port: 8000
@@ -11,30 +11,30 @@ tags:
   - openenv
 ---
 
-# Emergency Service Rl Environment
+# Smart Emergency Environment
 
 A simple test environment that echoes back messages. Perfect for testing the env APIs as well as demonstrating environment usage patterns.
 
 ## Quick Start
 
-The simplest way to use the Emergency Service Rl environment is through the `EmergencyServiceRlEnv` class:
+The simplest way to use the Smart Emergency environment is through the `SmartEmergencyEnv` class:
 
 ```python
-from Emergency_service_RL import EmergencyServiceRlAction, EmergencyServiceRlEnv
+from smart_emergency import SmartEmergencyAction, SmartEmergencyEnv
 
 try:
     # Create environment from Docker image
-    Emergency_service_RLenv = EmergencyServiceRlEnv.from_docker_image("Emergency_service_RL-env:latest")
+    smart_emergencyenv = SmartEmergencyEnv.from_docker_image("smart_emergency-env:latest")
 
     # Reset
-    result = Emergency_service_RLenv.reset()
+    result = smart_emergencyenv.reset()
     print(f"Reset: {result.observation.echoed_message}")
 
     # Send multiple messages
     messages = ["Hello, World!", "Testing echo", "Final message"]
 
     for msg in messages:
-        result = Emergency_service_RLenv.step(EmergencyServiceRlAction(message=msg))
+        result = smart_emergencyenv.step(SmartEmergencyAction(message=msg))
         print(f"Sent: '{msg}'")
         print(f"  → Echoed: '{result.observation.echoed_message}'")
         print(f"  → Length: {result.observation.message_length}")
@@ -42,10 +42,10 @@ try:
 
 finally:
     # Always clean up
-    Emergency_service_RLenv.close()
+    smart_emergencyenv.close()
 ```
 
-That's it! The `EmergencyServiceRlEnv.from_docker_image()` method handles:
+That's it! The `SmartEmergencyEnv.from_docker_image()` method handles:
 - Starting the Docker container
 - Waiting for the server to be ready
 - Connecting to the environment
@@ -57,7 +57,7 @@ Before using the environment, you need to build the Docker image:
 
 ```bash
 # From project root
-docker build -t Emergency_service_RL-env:latest -f server/Dockerfile .
+docker build -t smart_emergency-env:latest -f server/Dockerfile .
 ```
 
 ## Deploying to Hugging Face Spaces
@@ -119,11 +119,11 @@ The deployed space includes:
 ## Environment Details
 
 ### Action
-**EmergencyServiceRlAction**: Contains a single field
+**SmartEmergencyAction**: Contains a single field
 - `message` (str) - The message to echo back
 
 ### Observation
-**EmergencyServiceRlObservation**: Contains the echo response and metadata
+**SmartEmergencyObservation**: Contains the echo response and metadata
 - `echoed_message` (str) - The message echoed back
 - `message_length` (int) - Length of the message
 - `reward` (float) - Reward based on message length (length × 0.1)
@@ -140,35 +140,35 @@ The reward is calculated as: `message_length × 0.1`
 
 ### Connecting to an Existing Server
 
-If you already have a Emergency Service Rl environment server running, you can connect directly:
+If you already have a Smart Emergency environment server running, you can connect directly:
 
 ```python
-from Emergency_service_RL import EmergencyServiceRlEnv
+from smart_emergency import SmartEmergencyEnv
 
 # Connect to existing server
-Emergency_service_RLenv = EmergencyServiceRlEnv(base_url="<ENV_HTTP_URL_HERE>")
+smart_emergencyenv = SmartEmergencyEnv(base_url="<ENV_HTTP_URL_HERE>")
 
 # Use as normal
-result = Emergency_service_RLenv.reset()
-result = Emergency_service_RLenv.step(EmergencyServiceRlAction(message="Hello!"))
+result = smart_emergencyenv.reset()
+result = smart_emergencyenv.step(SmartEmergencyAction(message="Hello!"))
 ```
 
-Note: When connecting to an existing server, `Emergency_service_RLenv.close()` will NOT stop the server.
+Note: When connecting to an existing server, `smart_emergencyenv.close()` will NOT stop the server.
 
 ### Using the Context Manager
 
 The client supports context manager usage for automatic connection management:
 
 ```python
-from Emergency_service_RL import EmergencyServiceRlAction, EmergencyServiceRlEnv
+from smart_emergency import SmartEmergencyAction, SmartEmergencyEnv
 
 # Connect with context manager (auto-connects and closes)
-with EmergencyServiceRlEnv(base_url="http://localhost:8000") as env:
+with SmartEmergencyEnv(base_url="http://localhost:8000") as env:
     result = env.reset()
     print(f"Reset: {result.observation.echoed_message}")
     # Multiple steps with low latency
     for msg in ["Hello", "World", "!"]:
-        result = env.step(EmergencyServiceRlAction(message=msg))
+        result = env.step(SmartEmergencyAction(message=msg))
         print(f"Echoed: {result.observation.echoed_message}")
 ```
 
@@ -185,9 +185,9 @@ modify `server/app.py` to use factory mode:
 ```python
 # In server/app.py - use factory mode for concurrent sessions
 app = create_app(
-    EmergencyServiceRlEnvironment,  # Pass class, not instance
-    EmergencyServiceRlAction,
-    EmergencyServiceRlObservation,
+    SmartEmergencyEnvironment,  # Pass class, not instance
+    SmartEmergencyAction,
+    SmartEmergencyObservation,
     max_concurrent_envs=4,  # Allow 4 concurrent sessions
 )
 ```
@@ -195,14 +195,14 @@ app = create_app(
 Then multiple clients can connect simultaneously:
 
 ```python
-from Emergency_service_RL import EmergencyServiceRlAction, EmergencyServiceRlEnv
+from smart_emergency import SmartEmergencyAction, SmartEmergencyEnv
 from concurrent.futures import ThreadPoolExecutor
 
 def run_episode(client_id: int):
-    with EmergencyServiceRlEnv(base_url="http://localhost:8000") as env:
+    with SmartEmergencyEnv(base_url="http://localhost:8000") as env:
         result = env.reset()
         for i in range(10):
-            result = env.step(EmergencyServiceRlAction(message=f"Client {client_id}, step {i}"))
+            result = env.step(SmartEmergencyAction(message=f"Client {client_id}, step {i}"))
         return client_id, result.observation.message_length
 
 # Run 4 episodes concurrently
@@ -218,7 +218,7 @@ Test the environment logic directly without starting the HTTP server:
 
 ```bash
 # From the server directory
-python3 server/Emergency_service_RL_environment.py
+python3 server/smart_emergency_environment.py
 ```
 
 This verifies that:
@@ -238,18 +238,18 @@ uvicorn server.app:app --reload
 ## Project Structure
 
 ```
-Emergency_service_RL/
+smart_emergency/
 ├── .dockerignore         # Docker build exclusions
 ├── __init__.py            # Module exports
 ├── README.md              # This file
 ├── openenv.yaml           # OpenEnv manifest
 ├── pyproject.toml         # Project metadata and dependencies
 ├── uv.lock                # Locked dependencies (generated)
-├── client.py              # EmergencyServiceRlEnv client
+├── client.py              # SmartEmergencyEnv client
 ├── models.py              # Action and Observation models
 └── server/
     ├── __init__.py        # Server module exports
-    ├── Emergency_service_RL_environment.py  # Core environment logic
+    ├── smart_emergency_environment.py  # Core environment logic
     ├── app.py             # FastAPI application (HTTP + WebSocket endpoints)
     └── Dockerfile         # Container image definition
 ```

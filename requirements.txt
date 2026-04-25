@@ -1,7 +1,0 @@
-fastapi>=0.100.0
-uvicorn>=0.23.0
-pydantic>=2.0.0
-openenv-core>=0.2.2
-python-multipart
-# Add any other libraries if you used them in your custom logic
-# numpy>=1.24.0
