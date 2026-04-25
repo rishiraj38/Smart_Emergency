@@ -11,7 +11,7 @@ Action: the agent's structured dispatch decision per incoming 911 call.
 Observation: the text-based observation the agent receives each step.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from openenv.core.env_server.types import Action, Observation
 from pydantic import Field
@@ -35,13 +35,14 @@ class SmartEmergencyAction(Action):
     """
     The agent's response to an incoming 911 call.
 
-    Two modes:
+    Three modes:
       - action_type='dispatch': handle a new emergency
       - action_type='duplicate': flag as repeat of an existing event
+      - action_type='hold': queue event for a busy vehicle to handle after it frees
     """
 
-    action_type: str = Field(
-        ..., description="'dispatch' or 'duplicate'"
+    action_type: Literal["dispatch", "duplicate", "hold"] = Field(
+        ..., description="'dispatch', 'duplicate', or 'hold'"
     )
     severity_pred: int = Field(
         ..., ge=1, le=5, description="Predicted severity 1-5"
@@ -53,10 +54,10 @@ class SmartEmergencyAction(Action):
         None, description="EVT-NNNN of the event this duplicates (required if is_duplicate)"
     )
     vehicle_type: Optional[str] = Field(
-        None, description="'police', 'ambulance', or 'fire' (required if dispatch)"
+        None, description="'police', 'ambulance', or 'fire' (required if dispatch or hold)"
     )
     vehicle_id: Optional[str] = Field(
-        None, description="Specific unit ID to dispatch (required if dispatch)"
+        None, description="Unit to dispatch now (dispatch) or busy unit to queue for (hold)"
     )
     reroute: Optional[RerouteAction] = Field(
         None, description="Optional reroute instruction"
