@@ -4,79 +4,75 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Smart Emergency Environment Client."""
+"""Dispatch911 Environment Client."""
 
-from typing import Dict
+from typing import Dict, Optional
 
 from openenv.core import EnvClient
 from openenv.core.client_types import StepResult
 from openenv.core.env_server.types import State
 
-from .models import SmartEmergencyAction, SmartEmergencyObservation
+from .models import SmartEmergencyAction, SmartEmergencyObservation, RerouteAction
 
 
 class SmartEmergencyEnv(
     EnvClient[SmartEmergencyAction, SmartEmergencyObservation, State]
 ):
     """
-    Client for the Smart Emergency Environment.
-
-    This client maintains a persistent WebSocket connection to the environment server,
-    enabling efficient multi-step interactions with lower latency.
-    Each client instance has its own dedicated environment session on the server.
+    Client for the Dispatch911 Environment.
 
     Example:
-        >>> # Connect to a running server
         >>> with SmartEmergencyEnv(base_url="http://localhost:8000") as client:
         ...     result = client.reset()
-        ...     print(result.observation.echoed_message)
+        ...     print(result.observation.prompt)
         ...
-        ...     result = client.step(SmartEmergencyAction(message="Hello!"))
-        ...     print(result.observation.echoed_message)
-
-    Example with Docker:
-        >>> # Automatically start container and connect
-        >>> client = SmartEmergencyEnv.from_docker_image("smart_emergency-env:latest")
-        >>> try:
-        ...     result = client.reset()
-        ...     result = client.step(SmartEmergencyAction(message="Test"))
-        ... finally:
-        ...     client.close()
+        ...     action = SmartEmergencyAction(
+        ...         action_type="dispatch",
+        ...         severity_pred=3,
+        ...         is_duplicate=False,
+        ...         vehicle_type="ambulance",
+        ...         vehicle_id="ambulance_0",
+        ...     )
+        ...     result = client.step(action)
+        ...     print(result.observation.reward_breakdown)
     """
 
     def _step_payload(self, action: SmartEmergencyAction) -> Dict:
-        """
-        Convert SmartEmergencyAction to JSON payload for step message.
-
-        Args:
-            action: SmartEmergencyAction instance
-
-        Returns:
-            Dictionary representation suitable for JSON encoding
-        """
-        return {
-            "message": action.message,
+        """Convert SmartEmergencyAction to JSON payload."""
+        payload: Dict = {
+            "action_type": action.action_type,
+            "severity_pred": action.severity_pred,
+            "is_duplicate": action.is_duplicate,
         }
+        if action.duplicate_of_event_id is not None:
+            payload["duplicate_of_event_id"] = action.duplicate_of_event_id
+        if action.vehicle_type is not None:
+            payload["vehicle_type"] = action.vehicle_type
+        if action.vehicle_id is not None:
+            payload["vehicle_id"] = action.vehicle_id
+        if action.reroute is not None:
+            payload["reroute"] = {
+                "vehicle_to_reroute": action.reroute.vehicle_to_reroute,
+                "from_event_id": action.reroute.from_event_id,
+                "to_new_event": action.reroute.to_new_event,
+                "replacement_vehicle_id": action.reroute.replacement_vehicle_id,
+            }
+        return payload
 
     def _parse_result(self, payload: Dict) -> StepResult[SmartEmergencyObservation]:
-        """
-        Parse server response into StepResult[SmartEmergencyObservation].
-
-        Args:
-            payload: JSON response data from server
-
-        Returns:
-            StepResult with SmartEmergencyObservation
-        """
+        """Parse server response into StepResult."""
         obs_data = payload.get("observation", {})
         observation = SmartEmergencyObservation(
-            echoed_message=obs_data.get("echoed_message", ""),
-            message_length=obs_data.get("message_length", 0),
+            prompt=obs_data.get("prompt", ""),
+            step=obs_data.get("step", 0),
+            call_id=obs_data.get("call_id", ""),
+            reward_breakdown=obs_data.get("reward_breakdown", {}),
+            active_event_ids=obs_data.get("active_event_ids", []),
+            fleet_utilisation=obs_data.get("fleet_utilisation", 0.0),
             done=payload.get("done", False),
             reward=payload.get("reward"),
             metadata=obs_data.get("metadata", {}),
         )
-
         return StepResult(
             observation=observation,
             reward=payload.get("reward"),
@@ -84,15 +80,7 @@ class SmartEmergencyEnv(
         )
 
     def _parse_state(self, payload: Dict) -> State:
-        """
-        Parse server response into State object.
-
-        Args:
-            payload: JSON response from state request
-
-        Returns:
-            State object with episode_id and step_count
-        """
+        """Parse server response into State."""
         return State(
             episode_id=payload.get("episode_id"),
             step_count=payload.get("step_count", 0),

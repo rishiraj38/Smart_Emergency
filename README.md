@@ -1,8 +1,8 @@
 ---
 title: Smart Emergency Environment Server
-emoji: 🎯
+emoji: 🎧
 colorFrom: pink
-colorTo: blue
+colorTo: green
 sdk: docker
 pinned: false
 app_port: 8000
@@ -46,6 +46,7 @@ finally:
 ```
 
 That's it! The `SmartEmergencyEnv.from_docker_image()` method handles:
+
 - Starting the Docker container
 - Waiting for the server to be ready
 - Connecting to the environment
@@ -73,6 +74,7 @@ openenv push --namespace my-org --private
 ```
 
 The `openenv push` command will:
+
 1. Validate that the directory is an OpenEnv environment (checks for `openenv.yaml`)
 2. Prepare a custom build for Hugging Face Docker space (enables web interface)
 3. Upload to Hugging Face (ensuring you're logged in)
@@ -111,6 +113,7 @@ After deployment, your space will be available at:
 `https://huggingface.co/spaces/<repo-id>`
 
 The deployed space includes:
+
 - **Web Interface** at `/web` - Interactive UI for exploring the environment
 - **API Documentation** at `/docs` - Full OpenAPI/Swagger interface
 - **Health Check** at `/health` - Container health monitoring
@@ -119,11 +122,15 @@ The deployed space includes:
 ## Environment Details
 
 ### Action
+
 **SmartEmergencyAction**: Contains a single field
+
 - `message` (str) - The message to echo back
 
 ### Observation
+
 **SmartEmergencyObservation**: Contains the echo response and metadata
+
 - `echoed_message` (str) - The message echoed back
 - `message_length` (int) - Length of the message
 - `reward` (float) - Reward based on message length (length × 0.1)
@@ -131,7 +138,9 @@ The deployed space includes:
 - `metadata` (dict) - Additional info like step count
 
 ### Reward
+
 The reward is calculated as: `message_length × 0.1`
+
 - "Hi" → reward: 0.2
 - "Hello, World!" → reward: 1.3
 - Empty message → reward: 0.0
@@ -173,6 +182,7 @@ with SmartEmergencyEnv(base_url="http://localhost:8000") as env:
 ```
 
 The client uses WebSocket connections for:
+
 - **Lower latency**: No HTTP connection overhead per request
 - **Persistent session**: Server maintains your environment state
 - **Efficient for episodes**: Better for many sequential steps
@@ -222,6 +232,7 @@ python3 server/smart_emergency_environment.py
 ```
 
 This verifies that:
+
 - Environment resets correctly
 - Step executes actions properly
 - State tracking works

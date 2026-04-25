@@ -7,10 +7,11 @@
 """Smart Emergency Environment."""
 
 from .client import SmartEmergencyEnv
-from .models import SmartEmergencyAction, SmartEmergencyObservation
+from .models import SmartEmergencyAction, SmartEmergencyObservation, RerouteAction
 
 __all__ = [
     "SmartEmergencyAction",
     "SmartEmergencyObservation",
+    "RerouteAction",
     "SmartEmergencyEnv",
 ]

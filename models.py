@@ -5,23 +5,83 @@
 # LICENSE file in the root directory of this source tree.
 
 """
-Data models for the Smart Emergency Environment.
+Data models for the Dispatch911 Environment.
 
-The smart_emergency environment is a simple test environment that echoes back messages.
+Action: the agent's structured dispatch decision per incoming 911 call.
+Observation: the text-based observation the agent receives each step.
 """
+
+from typing import Dict, List, Optional
 
 from openenv.core.env_server.types import Action, Observation
 from pydantic import Field
 
 
+# ── Reroute sub-action ──────────────────────────────────────────────────────
+
+class RerouteAction(Action):
+    """Optional reroute block inside a dispatch action."""
+
+    vehicle_to_reroute: str = Field(..., description="Unit ID of vehicle to redirect")
+    from_event_id: str = Field(..., description="EVT-NNNN the vehicle is pulled from")
+    replacement_vehicle_id: Optional[str] = Field(
+        None, description="Free unit to cover the abandoned event"
+    )
+
+
+# ── Agent action ─────────────────────────────────────────────────────────────
+
 class SmartEmergencyAction(Action):
-    """Action for the Smart Emergency environment - just a message to echo."""
+    """
+    The agent's response to an incoming 911 call.
 
-    message: str = Field(..., description="Message to echo back")
+    Two modes:
+      - action_type='dispatch': handle a new emergency
+      - action_type='duplicate': flag as repeat of an existing event
+    """
 
+    action_type: str = Field(
+        ..., description="'dispatch' or 'duplicate'"
+    )
+    severity_pred: int = Field(
+        ..., ge=1, le=5, description="Predicted severity 1-5"
+    )
+    is_duplicate: bool = Field(
+        False, description="Whether the agent believes this is a repeat call"
+    )
+    duplicate_of_event_id: Optional[str] = Field(
+        None, description="EVT-NNNN of the event this duplicates (required if is_duplicate)"
+    )
+    vehicle_type: Optional[str] = Field(
+        None, description="'police', 'ambulance', or 'fire' (required if dispatch)"
+    )
+    vehicle_id: Optional[str] = Field(
+        None, description="Specific unit ID to dispatch (required if dispatch)"
+    )
+    reroute: Optional[RerouteAction] = Field(
+        None, description="Optional reroute instruction"
+    )
+
+
+# ── Observation ──────────────────────────────────────────────────────────────
 
 class SmartEmergencyObservation(Observation):
-    """Observation from the Smart Emergency environment - the echoed message."""
+    """
+    Observation returned to the agent each step.
 
-    echoed_message: str = Field(default="", description="The echoed message")
-    message_length: int = Field(default=0, description="Length of the echoed message")
+    Contains the full text prompt (transcript + active events + unit status +
+    city reference + dispatcher notes) and structured metadata for logging.
+    """
+
+    prompt: str = Field(default="", description="Full text observation for the LLM")
+    step: int = Field(default=0, description="Current step number")
+    call_id: str = Field(default="", description="ID of the incoming call")
+    reward_breakdown: Dict[str, float] = Field(
+        default_factory=dict, description="Per-component reward breakdown"
+    )
+    active_event_ids: List[str] = Field(
+        default_factory=list, description="Currently active event IDs"
+    )
+    fleet_utilisation: float = Field(
+        default=0.0, description="Fraction of fleet currently busy"
+    )

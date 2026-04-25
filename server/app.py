@@ -38,7 +38,7 @@ except Exception as e:  # pragma: no cover
 try:
     from ..models import SmartEmergencyAction, SmartEmergencyObservation
     from .smart_emergency_environment import SmartEmergencyEnvironment
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError):
     from models import SmartEmergencyAction, SmartEmergencyObservation
     from server.smart_emergency_environment import SmartEmergencyEnvironment
 
