@@ -5,3 +5,60 @@ runtime: fastapi
 app: server.app:app
 port: 8000
 
+description: >
+  A disaster management reinforcement learning environment where agents manage
+  emergency dispatch. Agents must triage incoming 911 calls, classify severity,
+  detect duplicate events, and dispatch limited resources (Police, Fire, Ambulance) 
+  across a procedural smart city graph.
+
+tags:
+  - openenv
+  - disaster-management
+  - smart-city
+  - dispatch
+  - rl
+
+tasks:
+  - id: 1
+    name: "Basic Dispatch"
+    difficulty: easy
+    description: "Low-volume calls, fewer active events. Focus on severity and vehicle type."
+    reward_max: 6.7
+
+  - id: 2
+    name: "Duplicate Detection"
+    difficulty: medium
+    description: "Higher duplicate rate. Agent must correlate repeat callers to existing events."
+    reward_max: 6.7
+
+  - id: 3
+    name: "Full Disaster Response"
+    difficulty: hard
+    description: "High call volume, scarce vehicles, reroutes required. Full 20-step episode."
+    reward_max: 6.7
+
+observation_space:
+  prompt: string
+  step: integer
+  call_id: string
+  reward_breakdown: object
+  active_event_ids: array
+  fleet_utilisation: float
+
+action_space:
+  action_type:
+    type: string
+    values: [dispatch, duplicate]
+  severity_pred:
+    type: integer
+  is_duplicate:
+    type: boolean
+  duplicate_of_event_id:
+    type: string
+  vehicle_type:
+    type: string
+    values: [police, ambulance, fire]
+  vehicle_id:
+    type: string
+  reroute:
+    type: object

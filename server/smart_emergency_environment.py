@@ -40,6 +40,11 @@ class SmartEmergencyEnvironment(Environment):
     """
 
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
+    
+    # Class-level tracking for /grader since create_app hides the instance
+    latest_history = []
+    latest_steps = 0
+    latest_episode_id = ""
 
     def __init__(self):
         self._state = State(episode_id=str(uuid4()), step_count=0)
@@ -50,22 +55,40 @@ class SmartEmergencyEnvironment(Environment):
         self._current_call: Optional[Call] = None
         self._dispatcher_notes: List[str] = []
         self._seed = 0
+        self._reward_history: List[dict] = []  # for /grader aggregation
 
     # ── Reset ────────────────────────────────────────────────────────────
 
-    def reset(self) -> SmartEmergencyObservation:
-        self._seed = random.randint(0, 999999)
+    def reset(self, task_id: int = 1, seed: Optional[int] = None) -> SmartEmergencyObservation:
+        self._seed = seed if seed is not None else random.randint(0, 999999)
         self._rng = random.Random(self._seed)
         self._city = generate_city(self._seed)
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._active_events = {}
         self._event_counter = 1
         self._dispatcher_notes = []
+        self._reward_history = []
+        
+        # Reset class-level tracker
+        SmartEmergencyEnvironment.latest_history = []
+        SmartEmergencyEnvironment.latest_steps = 0
+        SmartEmergencyEnvironment.latest_episode_id = self._state.episode_id
+        
+        self._task_id = task_id
+        if task_id == 1:
+            self._max_steps = 10
+            self._duplicate_prob = 0.10
+        elif task_id == 2:
+            self._max_steps = 15
+            self._duplicate_prob = 0.50
+        else:
+            self._max_steps = 20
+            self._duplicate_prob = 0.30
 
         # Generate first call
         self._current_call, self._event_counter = generate_call(
             self._city, 1, self._active_events,
-            DUPLICATE_PROB, self._rng, self._event_counter,
+            self._duplicate_prob, self._rng, self._event_counter,
         )
 
         obs_text = self._build_observation()
@@ -95,6 +118,11 @@ class SmartEmergencyEnvironment(Environment):
         # ── Evaluate action ──────────────────────────────────────────────
         reward_kwargs = self._evaluate_action(action, call)
         breakdown = compute_reward(**reward_kwargs)
+        self._reward_history.append(breakdown)
+        
+        # Update class-level tracker for grader
+        SmartEmergencyEnvironment.latest_history.append(breakdown)
+        SmartEmergencyEnvironment.latest_steps = self._state.step_count
 
         # ── Update state ─────────────────────────────────────────────────
         self._apply_action(action, call)
@@ -115,13 +143,13 @@ class SmartEmergencyEnvironment(Environment):
             self._dispatcher_notes = self._dispatcher_notes[-3:]
 
         # ── Check done ───────────────────────────────────────────────────
-        done = self._state.step_count >= MAX_STEPS
+        done = self._state.step_count >= getattr(self, "_max_steps", MAX_STEPS)
 
         # ── Generate next call ───────────────────────────────────────────
         if not done:
             self._current_call, self._event_counter = generate_call(
                 city, self._state.step_count + 1,
-                self._active_events, DUPLICATE_PROB,
+                self._active_events, getattr(self, "_duplicate_prob", DUPLICATE_PROB),
                 self._rng, self._event_counter,
             )
         obs_text = self._build_observation() if not done else "Episode complete."
