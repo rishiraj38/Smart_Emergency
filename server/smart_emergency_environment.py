@@ -154,6 +154,12 @@ class SmartEmergencyEnvironment(Environment):
             )
         obs_text = self._build_observation() if not done else "Episode complete."
 
+        gt = {
+            "severity": call.severity,
+            "emergency_type": call.emergency_type,
+            "is_duplicate": call.is_duplicate_of is not None,
+            "required_vehicle_type": call.required_vehicle_type,
+        }
         return SmartEmergencyObservation(
             prompt=obs_text,
             step=self._state.step_count,
@@ -163,13 +169,9 @@ class SmartEmergencyEnvironment(Environment):
             fleet_utilisation=self._fleet_util(),
             done=done,
             reward=breakdown.get("total", 0.0),
+            ground_truth=gt,
             metadata={
-                "ground_truth": {
-                    "severity": call.severity,
-                    "emergency_type": call.emergency_type,
-                    "is_duplicate": call.is_duplicate_of is not None,
-                    "required_vehicle_type": call.required_vehicle_type,
-                },
+                "ground_truth": gt,
                 "city_seed": self._seed,
             },
         )
