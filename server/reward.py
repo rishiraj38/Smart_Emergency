@@ -103,9 +103,9 @@ def compute_reward(
             if hold_vehicle_is_soonest:
                 breakdown["vehicle_choice"] += 0.3
     elif not vehicle_exists:
-        breakdown["vehicle_choice"] = -2.0
+        breakdown["vehicle_choice"] = -5.0
     elif not vehicle_is_free:
-        breakdown["vehicle_choice"] = -1.0
+        breakdown["vehicle_choice"] = -2.0  # busy vehicle — as bad as hallucination
     elif not vehicle_type_matches:
         breakdown["vehicle_choice"] = -0.5
     else:

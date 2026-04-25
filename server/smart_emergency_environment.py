@@ -290,20 +290,24 @@ class SmartEmergencyEnvironment(Environment):
                 self._active_events[eid].setdefault("calls", []).append(call.call_id)
             return
 
-        # Register new event
+        # Register new event (only if not already active)
         eid = call.event_id
-        self._active_events[eid] = {
-            "type": call.emergency_type,
-            "severity": call.severity,
-            "vehicle": call.required_vehicle_type,
-            "node_id": call.origin_node_id,
-            "node_name": call.origin_node_name,
-            "assigned_unit": None,
-            "unit_eta": None,
-            "held_for_unit": None,
-            "step_opened": self._state.step_count,
-            "calls": [call.call_id],
-        }
+        if eid not in self._active_events:
+            self._active_events[eid] = {
+                "type": call.emergency_type,
+                "severity": call.severity,
+                "vehicle": call.required_vehicle_type,
+                "node_id": call.origin_node_id,
+                "node_name": call.origin_node_name,
+                "assigned_unit": None,
+                "unit_eta": None,
+                "held_for_unit": None,
+                "step_opened": self._state.step_count,
+                "calls": [call.call_id],
+            }
+        else:
+            # Event already exists — just link this call
+            self._active_events[eid].setdefault("calls", []).append(call.call_id)
 
         # ── Hold action ──────────────────────────────────────────────────
         if action.action_type == "hold" and action.vehicle_id:
@@ -350,14 +354,25 @@ class SmartEmergencyEnvironment(Environment):
         # Normal dispatch
         if action.vehicle_id:
             veh = self._find_vehicle(action.vehicle_id)
-            if veh and veh.status == "FREE":
-                travel, path = dijkstra(city, veh.current_node, call.origin_node_id)
-                veh.status = "DISPATCHED"
-                veh.assigned_event = eid
-                veh.eta = max(1, int(travel))
-                veh.path = path
-                self._active_events[eid]["assigned_unit"] = veh.unit_id
-                self._active_events[eid]["unit_eta"] = veh.eta
+            if veh is None:
+                # Hallucinated vehicle — event stays UNASSIGNED
+                return
+            if veh.status != "FREE":
+                # Vehicle is busy — auto-convert to hold.
+                # Penalty still applied in reward, but the event gets queued.
+                veh.destinations.append(
+                    Destination(node_id=call.origin_node_id, event_id=eid)
+                )
+                self._active_events[eid]["held_for_unit"] = veh.unit_id
+                return
+            # Vehicle is free — dispatch it
+            travel, path = dijkstra(city, veh.current_node, call.origin_node_id)
+            veh.status = "DISPATCHED"
+            veh.assigned_event = eid
+            veh.eta = max(1, int(travel))
+            veh.path = path
+            self._active_events[eid]["assigned_unit"] = veh.unit_id
+            self._active_events[eid]["unit_eta"] = veh.eta
 
     # ── Vehicle tick ─────────────────────────────────────────────────────
 
@@ -392,6 +407,16 @@ class SmartEmergencyEnvironment(Environment):
                     self._dispatch_next_destination(v)
 
         for eid in resolved:
+            self._active_events.pop(eid, None)
+
+        # Clean up stale unassigned events (no unit, no hold, open > 3 steps)
+        stale = []
+        for eid, evt in self._active_events.items():
+            if (evt.get("assigned_unit") is None
+                    and evt.get("held_for_unit") is None
+                    and self._state.step_count - evt.get("step_opened", 0) > 3):
+                stale.append(eid)
+        for eid in stale:
             self._active_events.pop(eid, None)
 
     def _dispatch_next_destination(self, v: Vehicle):
