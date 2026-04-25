@@ -44,6 +44,13 @@ class Node:
 
 
 @dataclass
+class Destination:
+    """A queued assignment for a vehicle (used by hold actions)."""
+    node_id: str       # target node to travel to
+    event_id: str      # EVT-NNNN this destination serves
+
+
+@dataclass
 class Vehicle:
     unit_id: str
     vehicle_type: str  # police / ambulance / fire
@@ -56,6 +63,7 @@ class Vehicle:
     return_remaining: int = 0
     path: List[str] = field(default_factory=list)
     transit_progress: float = 0.0  # 0..1 along current path
+    destinations: List[Destination] = field(default_factory=list)  # queued future assignments
 
 
 @dataclass

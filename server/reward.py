@@ -36,6 +36,11 @@ def compute_reward(
     reroute_severity_delta: int = 0,
     reroute_faster: bool = False,
     replacement_valid: Optional[bool] = None,
+    # hold context
+    hold_is_action: bool = False,
+    hold_free_unit_exists: bool = False,
+    hold_min_busy_severity: int = 0,
+    hold_vehicle_is_soonest: bool = False,
 ) -> Dict[str, float]:
     """Return per-component reward breakdown + total."""
 
@@ -68,9 +73,35 @@ def compute_reward(
     else:
         breakdown["vehicle_type"] = -1.5
 
-    # ── 4. Vehicle choice ────────────────────────────────────────────────
+    # ── 4. Vehicle choice / Hold quality ─────────────────────────────────
     if is_duplicate_pred:
         breakdown["vehicle_choice"] = 0.0
+    elif hold_is_action:
+        # Hold-specific scoring
+        if hold_free_unit_exists:
+            # A free unit exists — holding is unjustified
+            breakdown["vehicle_choice"] = -2.0
+        elif not vehicle_exists:
+            # Hallucinated vehicle ID
+            breakdown["vehicle_choice"] = -2.0
+        elif vehicle_is_free:
+            # Named a FREE unit but chose hold instead of dispatch
+            breakdown["vehicle_choice"] = -1.5
+        else:
+            # All units of correct type are busy — evaluate severity
+            sev_delta = hold_min_busy_severity - gt_severity
+            if sev_delta > 0:
+                # All busy units have strictly higher severity — justified
+                breakdown["vehicle_choice"] = 1.0
+            elif sev_delta == 0:
+                # Some busy units have equal severity — reasonable
+                breakdown["vehicle_choice"] = 0.5
+            else:
+                # Some busy units have lower severity — should have rerouted
+                breakdown["vehicle_choice"] = -0.3 * abs(sev_delta)
+            # Bonus: picked the soonest-to-free unit
+            if hold_vehicle_is_soonest:
+                breakdown["vehicle_choice"] += 0.3
     elif not vehicle_exists:
         breakdown["vehicle_choice"] = -2.0
     elif not vehicle_is_free:
@@ -83,7 +114,9 @@ def compute_reward(
         breakdown["vehicle_choice"] = prox * mult
 
     # ── 5. Reroute ───────────────────────────────────────────────────────
-    if not reroute_attempted:
+    if hold_is_action:
+        breakdown["reroute"] = 0.0  # neutral for hold actions
+    elif not reroute_attempted:
         breakdown["reroute"] = 0.0
     elif not reroute_valid:
         breakdown["reroute"] = -1.0
@@ -105,3 +138,4 @@ def compute_reward(
 
     breakdown["total"] = sum(breakdown.values())
     return breakdown
+

@@ -17,7 +17,7 @@ try:
 except ImportError:
     from models import SmartEmergencyAction, SmartEmergencyObservation
 
-from .city import City, Vehicle, dijkstra, generate_city
+from .city import City, Destination, Vehicle, dijkstra, generate_city
 from .calls import Call, generate_call
 from .reward import PARSE_FAILURE_PENALTY, compute_reward
 
@@ -106,6 +106,8 @@ class SmartEmergencyEnvironment(Environment):
         note = f"Step {self._state.step_count}: {call.call_id}"
         if action.is_duplicate:
             note += f" → Duplicate of {action.duplicate_of_event_id or '?'}"
+        elif action.action_type == "hold":
+            note += f" → HOLD ({action.vehicle_type}, waiting for {action.vehicle_id or '?'})"
         elif action.action_type == "dispatch":
             note += f" → {action.vehicle_type} {action.vehicle_id or '?'}"
         self._dispatcher_notes.append(note)
@@ -161,7 +163,56 @@ class SmartEmergencyEnvironment(Environment):
         travel = 0.0
         is_nearest = False
 
-        if not action.is_duplicate and action.vehicle_id:
+        # Hold checks
+        hold_is_action = action.action_type == "hold"
+        hold_free_exists = False
+        hold_min_busy_sev = 0
+        hold_vehicle_soonest = False
+
+        if hold_is_action:
+            # Check if the named vehicle exists and its state
+            if action.vehicle_id:
+                veh = self._find_vehicle(action.vehicle_id)
+                if veh is None:
+                    v_exists = False
+                else:
+                    v_free = veh.status == "FREE"
+                    v_type_match = veh.vehicle_type == (action.vehicle_type or "")
+            else:
+                v_exists = False
+
+            # Check if any free unit of the correct type exists
+            vtype = action.vehicle_type or call.required_vehicle_type
+            free_of_type = [
+                v for v in city.vehicles
+                if v.status == "FREE" and v.vehicle_type == vtype
+            ]
+            hold_free_exists = len(free_of_type) > 0
+
+            # Find min severity among busy units of this type
+            busy_of_type = [
+                v for v in city.vehicles
+                if v.status != "FREE" and v.vehicle_type == vtype
+                and v.assigned_event is not None
+            ]
+            if busy_of_type:
+                busy_sevs = []
+                for bv in busy_of_type:
+                    evt = self._active_events.get(bv.assigned_event, {})
+                    busy_sevs.append(evt.get("severity", 5))
+                hold_min_busy_sev = min(busy_sevs)
+
+                # Check if named vehicle is the soonest to free
+                if v_exists and not v_free and action.vehicle_id:
+                    veh = self._find_vehicle(action.vehicle_id)
+                    if veh and veh.eta is not None:
+                        min_eta = min(
+                            (bv.eta for bv in busy_of_type if bv.eta is not None),
+                            default=999,
+                        )
+                        hold_vehicle_soonest = veh.eta <= min_eta
+
+        elif not action.is_duplicate and action.vehicle_id:
             veh = self._find_vehicle(action.vehicle_id)
             if veh is None:
                 v_exists = False
@@ -180,7 +231,7 @@ class SmartEmergencyEnvironment(Environment):
                         is_nearest = abs(travel - min_t) < 0.1
 
         # Reroute checks
-        reroute_attempted = action.reroute is not None
+        reroute_attempted = action.reroute is not None and not hold_is_action
         reroute_valid = False
         reroute_sev_delta = 0
         reroute_faster = False
@@ -220,6 +271,10 @@ class SmartEmergencyEnvironment(Environment):
             reroute_severity_delta=reroute_sev_delta,
             reroute_faster=reroute_faster,
             replacement_valid=replacement_valid,
+            hold_is_action=hold_is_action,
+            hold_free_unit_exists=hold_free_exists,
+            hold_min_busy_severity=hold_min_busy_sev,
+            hold_vehicle_is_soonest=hold_vehicle_soonest,
         )
 
     # ── Apply action to state ────────────────────────────────────────────
@@ -245,9 +300,21 @@ class SmartEmergencyEnvironment(Environment):
             "node_name": call.origin_node_name,
             "assigned_unit": None,
             "unit_eta": None,
+            "held_for_unit": None,
             "step_opened": self._state.step_count,
             "calls": [call.call_id],
         }
+
+        # ── Hold action ──────────────────────────────────────────────────
+        if action.action_type == "hold" and action.vehicle_id:
+            veh = self._find_vehicle(action.vehicle_id)
+            if veh is not None and veh.status != "FREE":
+                # Queue this event as a future destination for the vehicle
+                veh.destinations.append(
+                    Destination(node_id=call.origin_node_id, event_id=eid)
+                )
+                self._active_events[eid]["held_for_unit"] = action.vehicle_id
+            return
 
         # Handle reroute
         if action.reroute is not None:
@@ -321,9 +388,31 @@ class SmartEmergencyEnvironment(Environment):
                     v.status = "FREE"
                     v.current_node = v.home_node
                     v.assigned_event = None
+                    # Auto-dispatch to next queued destination (from hold)
+                    self._dispatch_next_destination(v)
 
         for eid in resolved:
             self._active_events.pop(eid, None)
+
+    def _dispatch_next_destination(self, v: Vehicle):
+        """If the vehicle has queued destinations, pop the first and dispatch."""
+        city = self._city
+        assert city is not None
+
+        while v.destinations:
+            dest = v.destinations.pop(0)
+            # Only dispatch if the event is still active and unassigned
+            evt = self._active_events.get(dest.event_id)
+            if evt is not None and evt.get("assigned_unit") is None:
+                travel, path = dijkstra(city, v.current_node, dest.node_id)
+                v.status = "DISPATCHED"
+                v.assigned_event = dest.event_id
+                v.eta = max(1, int(travel))
+                v.path = path
+                evt["assigned_unit"] = v.unit_id
+                evt["unit_eta"] = v.eta
+                return
+        # No valid destinations left — vehicle stays FREE
 
     # ── Observation builder ──────────────────────────────────────────────
 
@@ -344,13 +433,20 @@ class SmartEmergencyEnvironment(Environment):
         parts.append("=== ACTIVE EVENTS ===")
         if self._active_events:
             for eid, evt in self._active_events.items():
-                unit = evt.get("assigned_unit") or "UNASSIGNED"
+                unit = evt.get("assigned_unit")
+                held = evt.get("held_for_unit")
                 eta = evt.get("unit_eta")
-                eta_str = f"ETA {eta} min" if eta else ("ON SCENE" if unit != "UNASSIGNED" else "")
+                if unit:
+                    eta_str = f"ETA {eta} min" if eta else "ON SCENE"
+                    status_str = f"{unit} {eta_str}"
+                elif held:
+                    status_str = f"HELD → {held}"
+                else:
+                    status_str = "UNASSIGNED"
                 sev = evt.get("severity", "?")
                 parts.append(
                     f"{eid} | {evt['type']:10s} | {evt['node_name']:30s} | "
-                    f"sev {sev} | {unit} {eta_str} | opened step {evt['step_opened']}"
+                    f"sev {sev} | {status_str} | opened step {evt['step_opened']}"
                 )
         else:
             parts.append("(none)")
