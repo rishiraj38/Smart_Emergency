@@ -86,3 +86,7 @@ class SmartEmergencyObservation(Observation):
     fleet_utilisation: float = Field(
         default=0.0, description="Fraction of fleet currently busy"
     )
+    ground_truth: Dict = Field(
+        default_factory=dict,
+        description="Hidden ground truth for the current call (populated after step)",
+    )

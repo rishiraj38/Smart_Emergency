@@ -54,14 +54,26 @@ class SmartEmergencyEnv(
             payload["reroute"] = {
                 "vehicle_to_reroute": action.reroute.vehicle_to_reroute,
                 "from_event_id": action.reroute.from_event_id,
-                "to_new_event": action.reroute.to_new_event,
                 "replacement_vehicle_id": action.reroute.replacement_vehicle_id,
             }
         return payload
 
     def _parse_result(self, payload: Dict) -> StepResult[SmartEmergencyObservation]:
-        """Parse server response into StepResult."""
+        """Parse server response into StepResult.
+
+        Note: OpenEnv's serialize_observation() intentionally strips 'metadata',
+        'done', and 'reward' from the nested observation dict and promotes them
+        to the top level. ground_truth is now a first-class field on the
+        observation model so it survives serialization.
+        """
         obs_data = payload.get("observation", {})
+        # metadata is stripped by the framework; ground_truth is now a dedicated field
+        metadata = payload.get("metadata", obs_data.get("metadata", {}))
+        # Support both the new dedicated ground_truth field and the legacy metadata path
+        gt = obs_data.get("ground_truth") or metadata.get("ground_truth", {})
+        if gt:
+            metadata = dict(metadata)
+            metadata["ground_truth"] = gt
         observation = SmartEmergencyObservation(
             prompt=obs_data.get("prompt", ""),
             step=obs_data.get("step", 0),
@@ -71,7 +83,8 @@ class SmartEmergencyEnv(
             fleet_utilisation=obs_data.get("fleet_utilisation", 0.0),
             done=payload.get("done", False),
             reward=payload.get("reward"),
-            metadata=obs_data.get("metadata", {}),
+            ground_truth=gt or {},
+            metadata=metadata,
         )
         return StepResult(
             observation=observation,

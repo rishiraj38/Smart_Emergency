@@ -92,9 +92,9 @@ def generate_city(seed: int) -> City:
         ("hospital", 1),
         ("fire_station", 1),
         ("police_station", 1),
-        ("residential", rng.randint(6, 10)),
-        ("commercial", rng.randint(2, 4)),
-        ("road_junction", rng.randint(2, 4)),
+        ("residential", rng.randint(3, 5)),
+        ("commercial", rng.randint(1, 2)),
+        ("road_junction", rng.randint(1, 2)),
     ]
     idx = 0
     for ntype, count in node_specs:
