@@ -3,7 +3,7 @@
 from typing import Dict, Optional
 
 
-# ── Default reward config ────────────────────────────────────────────────────
+# Default reward config
 
 SEVERITY_REWARDS = {0: 1.0, 1: 0.6, 2: 0.2, 3: -0.2, 4: -0.5}
 PARSE_FAILURE_PENALTY = -2.0
@@ -52,11 +52,11 @@ def compute_reward(
 
     breakdown: Dict[str, float] = {}
 
-    # ── 1. Severity ──────────────────────────────────────────────────────
+    # 1. Severity
     err = abs(severity_pred - gt_severity)
     breakdown["severity"] = SEVERITY_REWARDS.get(err, -0.5)
 
-    # ── 2. Duplicate detection ───────────────────────────────────────────
+    # 2. Duplicate detection
     if not is_duplicate_pred and not gt_is_duplicate:
         breakdown["duplicate"] = 1.0
     elif not is_duplicate_pred and gt_is_duplicate:
@@ -71,7 +71,7 @@ def compute_reward(
         else:
             breakdown["duplicate"] = 0.3
 
-    # ── 3. Vehicle type ──────────────────────────────────────────────────
+    # 3. Vehicle type
     if is_duplicate_pred:
         breakdown["vehicle_type"] = 0.0
     elif vehicle_type_pred == gt_vehicle_type:
@@ -79,7 +79,7 @@ def compute_reward(
     else:
         breakdown["vehicle_type"] = -1.5
 
-    # ── 4. Vehicle choice / Hold quality ─────────────────────────────────
+    # 4. Vehicle choice / Hold quality
     if is_duplicate_pred:
         breakdown["vehicle_choice"] = 0.0
     elif hold_is_action:
@@ -119,7 +119,7 @@ def compute_reward(
         mult = 1.0 if is_nearest else 0.5
         breakdown["vehicle_choice"] = prox * mult
 
-    # ── 5. Reroute ───────────────────────────────────────────────────────
+    # 5. Reroute
     if hold_is_action:
         breakdown["reroute"] = 0.0  # neutral for hold actions
     elif not reroute_attempted:

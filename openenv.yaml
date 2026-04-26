@@ -22,19 +22,19 @@ tasks:
   - id: 1
     name: "Basic Dispatch"
     difficulty: easy
-    description: "Low-volume calls, fewer active events. Focus on severity and vehicle type."
+    description: "10 steps, 3 vehicles per type, 10% duplicates. Focus on severity and vehicle type."
     reward_max: 6.7
 
   - id: 2
-    name: "Duplicate Detection"
+    name: "Scarce Resources"
     difficulty: medium
-    description: "Higher duplicate rate. Agent must correlate repeat callers to existing events."
+    description: "15 steps, 2 vehicles per type, 30% duplicates. Must handle holds and pick nearest units."
     reward_max: 6.7
 
   - id: 3
     name: "Full Disaster Response"
     difficulty: hard
-    description: "High call volume, scarce vehicles, reroutes required. Full 20-step episode."
+    description: "20 steps, 1 vehicle per type, 50% duplicates. Requires reroutes and optimal triage."
     reward_max: 6.7
 
 observation_space:

@@ -6,10 +6,10 @@ from typing import List, Optional
 
 from .city import City
 
-# ── Call templates ────────────────────────────────────────────────────────────
+# Call templates
 
 TEMPLATES = [
-    # ── FIRE ──────────────────────────────────────────────────────────────
+    # FIRE
     {"type": "fire", "sev": 1, "vehicle": "fire",
      "text": "Hi, I think I see some smoke coming from behind {landmark}. It might be nothing but thought I should call."},
     {"type": "fire", "sev": 2, "vehicle": "fire",
@@ -22,7 +22,7 @@ TEMPLATES = [
      "text": "Building's on fire on {street} near {landmark}! People are yelling from the windows, please hurry!"},
     {"type": "fire", "sev": 5, "vehicle": "fire",
      "text": "There's a massive fire — the whole block near {landmark} is burning. Multiple buildings involved, I can see people trapped. Send everything you've got!"},
-    # ── MEDICAL ───────────────────────────────────────────────────────────
+    # MEDICAL
     {"type": "medical", "sev": 1, "vehicle": "ambulance",
      "text": "Hello, my neighbor fell and hurt her ankle at {address}. She's conscious and talking but can't walk."},
     {"type": "medical", "sev": 2, "vehicle": "ambulance",
@@ -35,7 +35,7 @@ TEMPLATES = [
      "text": "Someone's not breathing at {landmark}! A bystander is doing CPR. Please send an ambulance to {street} immediately!"},
     {"type": "medical", "sev": 5, "vehicle": "ambulance",
      "text": "There's been some kind of mass incident at {landmark} — multiple people down, some not moving. We need everything, {street} entrance."},
-    # ── CRIME ─────────────────────────────────────────────────────────────
+    # CRIME
     {"type": "crime", "sev": 1, "vehicle": "police",
      "text": "I'd like to report a shoplifter at {landmark} on {street}. They already left but I got a good look."},
     {"type": "crime", "sev": 2, "vehicle": "police",
@@ -48,7 +48,7 @@ TEMPLATES = [
      "text": "I think I heard gunshots near {address}! People are running. I'm hiding inside {landmark}, please send help!"},
     {"type": "crime", "sev": 5, "vehicle": "police",
      "text": "Active shooter at {landmark}! Multiple shots fired, people running everywhere. Send everyone NOW!"},
-    # ── ACCIDENT ──────────────────────────────────────────────────────────
+    # ACCIDENT
     {"type": "accident", "sev": 2, "vehicle": "ambulance",
      "text": "Fender bender on {street} near {landmark}. No injuries but the cars are blocking the road."},
     {"type": "accident", "sev": 3, "vehicle": "ambulance",
@@ -93,7 +93,7 @@ def generate_call(
     """
     node_ids = list(city.nodes.keys())
 
-    # ── Decide if duplicate ──────────────────────────────────────────────
+    # Decide if duplicate
     is_dup = False
     dup_event_id = None
     dup_event = None
@@ -121,7 +121,7 @@ def generate_call(
         event_id = f"EVT-{next_event_counter:04d}"
         next_event_counter += 1
 
-    # ── Build transcript ─────────────────────────────────────────────────
+    # Build transcript
     node = city.nodes[origin]
     neighbours = list(city.edges.get(origin, {}).keys())
     cross = city.nodes[rng.choice(neighbours)].street if neighbours else "unknown road"

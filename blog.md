@@ -1,6 +1,6 @@
-# 🚨 Smart Emergency Dispatch — Teaching AI to Save Lives with Reinforcement Learning
+# 🚨 Smart_Emergency — Teaching AI to Save Lives with Reinforcement Learning
 
-*Building an RL environment and training an LLM agent that acts as an expert 911 dispatcher — triaging emergencies, dispatching vehicles, and managing scarce resources across a simulated city.*
+*An OpenEnv India Hackathon 2026 project — building an RL environment and training an LLM agent that acts as an expert 911 dispatcher, triaging emergencies, dispatching vehicles, and managing scarce resources across a simulated city.*
 
 ---
 
@@ -10,7 +10,7 @@
 2. [Why This Problem Matters](#why-this-problem-matters)
 3. [Why We Chose This Problem](#why-we-chose-this-problem)
 4. [Our Approach — High Level](#our-approach--high-level)
-5. [The Environment — Dispatch911](#the-environment--dispatch911)
+5. [The Environment — Smart_Emergency](#the-environment--smart_emergency)
 6. [Reward Engineering](#reward-engineering)
 7. [Curriculum Learning — Task Difficulty](#curriculum-learning--task-difficulty)
 8. [The Agent — SFT + GRPO Training Pipeline](#the-agent--sft--grpo-training-pipeline)
@@ -124,7 +124,7 @@ We built a complete end-to-end system with two major components:
 
 ---
 
-## The Environment — Dispatch911
+## The Environment — Smart_Emergency
 
 ### Procedural City Generation
 
@@ -524,7 +524,7 @@ After training, the agent demonstrates:
 
 ## Conclusion
 
-We built **Smart Emergency Dispatch** — a complete RL pipeline for training LLM agents as emergency dispatchers. The key innovations are:
+We built **Smart_Emergency** — a complete RL pipeline for training LLM agents as emergency dispatchers, for the **OpenEnv India Hackathon 2026**. The key innovations are:
 
 1. **A rich, procedurally-generated environment** with realistic 911 transcripts, city graphs, and vehicle lifecycle management
 2. **5-component decomposed reward** with baseline subtraction for clean training signals
@@ -536,4 +536,4 @@ The environment is [live on Hugging Face Spaces](https://huggingface.co/spaces/H
 
 ---
 
-*Built with ❤️ using OpenEnv, Unsloth, TRL, and Hugging Face.*
+*Built for the OpenEnv India Hackathon 2026 with ❤️ using OpenEnv, Unsloth, TRL, and Hugging Face.*

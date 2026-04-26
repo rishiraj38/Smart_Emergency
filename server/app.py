@@ -29,7 +29,7 @@ except (ImportError, ModuleNotFoundError):
     from server.smart_emergency_environment import SmartEmergencyEnvironment
 
 
-# ── App ──────────────────────────────────────────────────────────────────────
+# App
 
 # We use create_app so OpenEnv can automatically mount its Gradio web UI at / and /web
 # when deployed to Hugging Face Spaces.
@@ -41,7 +41,7 @@ app = create_app(
     max_concurrent_envs=1,
 )
 
-# ── Health ───────────────────────────────────────────────────────────────────
+# Health
 
 @app.get("/health")
 def health():
@@ -52,7 +52,7 @@ def health():
     }
 
 
-# ── Tasks ────────────────────────────────────────────────────────────────────
+# Tasks
 
 @app.get("/tasks")
 def tasks():
@@ -84,7 +84,7 @@ def tasks():
     }
 
 
-# ── Grader ───────────────────────────────────────────────────────────────────
+# Grader
 
 @app.post("/grader")
 def grader():
@@ -92,7 +92,7 @@ def grader():
     Score the completed episode. Call this after done=True.
 
     Returns cumulative reward breakdown, per-component averages,
-    and a normalized 0–1 score suitable for hackathon leaderboards.
+    and a normalized 0-1 score suitable for hackathon leaderboards.
     """
     steps = SmartEmergencyEnvironment.latest_steps
 
@@ -147,7 +147,7 @@ def grader():
     }
 
 
-# ── Baseline ─────────────────────────────────────────────────────────────────
+# Baseline
 
 @app.get("/baseline")
 def baseline():
@@ -261,7 +261,7 @@ def baseline():
     }
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# Entry point
 
 def main(host: str = "0.0.0.0", port: int = 8000):
     import uvicorn

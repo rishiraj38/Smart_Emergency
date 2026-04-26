@@ -1,6 +1,6 @@
 .PHONY: build start serve stop health
 
-# ── Docker ────────────────────────────────────────────────────────────────────
+# Docker 
 build:
 	@docker build -t emergency:latest -f Dockerfile .
 
@@ -10,7 +10,7 @@ start:
 stop:
 	@docker ps -q --filter ancestor=emergency:latest | xargs -r docker stop
 
-# ── Local dev (uv) ────────────────────────────────────────────────────────────
+# Local dev (uv) 
 serve:
 	@uv run uvicorn server.app:app --host 0.0.0.0 --port 8000 --reload
 

@@ -17,7 +17,7 @@ from openenv.core.env_server.types import Action, Observation
 from pydantic import Field
 
 
-# ── Reroute sub-action ──────────────────────────────────────────────────────
+# Reroute sub-action 
 
 class RerouteAction(Action):
     """Optional reroute block inside a dispatch action."""
@@ -29,7 +29,7 @@ class RerouteAction(Action):
     )
 
 
-# ── Agent action ─────────────────────────────────────────────────────────────
+# Agent action 
 
 class SmartEmergencyAction(Action):
     """
@@ -64,7 +64,7 @@ class SmartEmergencyAction(Action):
     )
 
 
-# ── Observation ──────────────────────────────────────────────────────────────
+#  Observation 
 
 class SmartEmergencyObservation(Observation):
     """

@@ -21,7 +21,7 @@ from .city import City, Destination, Vehicle, dijkstra, generate_city
 from .calls import Call, generate_call
 from .reward import PARSE_FAILURE_PENALTY, compute_reward
 
-# ── Config defaults ──────────────────────────────────────────────────────────
+# Config defaults
 
 MAX_STEPS = 20
 DUPLICATE_PROB = 0.30
@@ -55,9 +55,9 @@ class SmartEmergencyEnvironment(Environment):
         self._current_call: Optional[Call] = None
         self._dispatcher_notes: List[str] = []
         self._seed = 0
-        self._reward_history: List[dict] = []  # for /grader aggregation
+        self._reward_history: List[dict] = []  
 
-    # ── Reset ────────────────────────────────────────────────────────────
+    # Reset
 
     def reset(self, task_id: int = 1, seed: Optional[int] = None) -> SmartEmergencyObservation:
         self._seed = seed if seed is not None else random.randint(0, 999999)
@@ -103,7 +103,7 @@ class SmartEmergencyEnvironment(Environment):
             reward=0.0,
         )
 
-    # ── Step ─────────────────────────────────────────────────────────────
+    # Step   
 
     def step(self, action: SmartEmergencyAction) -> SmartEmergencyObservation:
         # Auto-reset if step is called before reset
@@ -115,7 +115,7 @@ class SmartEmergencyEnvironment(Environment):
         city = self._city
         assert call is not None and city is not None
 
-        # ── Evaluate action ──────────────────────────────────────────────
+        # Evaluate action 
         reward_kwargs = self._evaluate_action(action, call)
         breakdown = compute_reward(**reward_kwargs)
         self._reward_history.append(breakdown)
@@ -124,13 +124,13 @@ class SmartEmergencyEnvironment(Environment):
         SmartEmergencyEnvironment.latest_history.append(breakdown)
         SmartEmergencyEnvironment.latest_steps = self._state.step_count
 
-        # ── Update state ─────────────────────────────────────────────────
+        # Update state 
         self._apply_action(action, call)
 
-        # ── Advance simulation clock ─────────────────────────────────────
+        # Advance simulation clock 
         self._tick_vehicles()
 
-        # ── Log dispatcher note ──────────────────────────────────────────
+        #  Log dispatcher note 
         note = f"Step {self._state.step_count}: {call.call_id}"
         if action.is_duplicate:
             note += f" → Duplicate of {action.duplicate_of_event_id or '?'}"
@@ -142,10 +142,10 @@ class SmartEmergencyEnvironment(Environment):
         if len(self._dispatcher_notes) > 3:
             self._dispatcher_notes = self._dispatcher_notes[-3:]
 
-        # ── Check done ───────────────────────────────────────────────────
+        #  Check done 
         done = self._state.step_count >= getattr(self, "_max_steps", MAX_STEPS)
 
-        # ── Generate next call ───────────────────────────────────────────
+        #  Generate next call 
         if not done:
             self._current_call, self._event_counter = generate_call(
                 city, self._state.step_count + 1,
@@ -176,7 +176,7 @@ class SmartEmergencyEnvironment(Environment):
             },
         )
 
-    # ── Evaluate ─────────────────────────────────────────────────────────
+    # Evaluate 
 
     def _evaluate_action(self, action: SmartEmergencyAction, call: Call) -> dict:
         """Build kwargs for compute_reward."""
@@ -307,7 +307,7 @@ class SmartEmergencyEnvironment(Environment):
             hold_vehicle_is_soonest=hold_vehicle_soonest,
         )
 
-    # ── Apply action to state ────────────────────────────────────────────
+    # Apply action to state 
 
     def _apply_action(self, action: SmartEmergencyAction, call: Call):
         city = self._city
@@ -469,7 +469,7 @@ class SmartEmergencyEnvironment(Environment):
                 return
         # No valid destinations left — vehicle stays FREE
 
-    # ── Observation builder ──────────────────────────────────────────────
+    # Observation builder 
 
     def _build_observation(self) -> str:
         call = self._current_call
@@ -538,7 +538,7 @@ class SmartEmergencyEnvironment(Environment):
 
         return "\n".join(parts)
 
-    # ── Helpers ──────────────────────────────────────────────────────────
+    # Helpers 
 
     def _find_vehicle(self, unit_id: str) -> Optional[Vehicle]:
         if self._city is None:

@@ -92,7 +92,7 @@ def generate_city(seed: int, difficulty: int = 1) -> City:
     rng = random.Random(seed)
     city = City(seed=seed)
 
-    # ── 1. Create nodes ──────────────────────────────────────────────────
+    # Create nodes
     node_specs: List[Tuple[str, int]] = [
         ("hospital", 1),
         ("fire_station", 1),
@@ -117,7 +117,7 @@ def generate_city(seed: int, difficulty: int = 1) -> City:
             city.edges[nid] = {}
             idx += 1
 
-    # ── 2. Build edges (proximity-biased) ────────────────────────────────
+    # Build edges
     node_ids = list(city.nodes.keys())
     for nid in node_ids:
         n = city.nodes[nid]
@@ -140,7 +140,7 @@ def generate_city(seed: int, difficulty: int = 1) -> City:
                 city.edges[nid][oid] = travel
                 city.edges[oid][nid] = travel
 
-    # ── 3. Ensure connectivity ───────────────────────────────────────────
+    # Ensure connectivity
     visited = set()
     stack = [node_ids[0]]
     while stack:
@@ -158,7 +158,7 @@ def generate_city(seed: int, difficulty: int = 1) -> City:
             city.edges[closest][uid] = d
             visited.add(uid)
 
-    # ── 4. Spawn vehicles (count scales with difficulty) ──────────────────
+    # 4. Spawn vehicles (count scales with difficulty) 
     # Easy (1): 3 per type — always a free unit available
     # Medium (2): 2 per type — sometimes all busy, must use hold
     # Hard (3): 1 per type — forces hold/reroute decisions constantly
