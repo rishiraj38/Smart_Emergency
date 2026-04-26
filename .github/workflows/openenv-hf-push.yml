@@ -41,4 +41,4 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HUGGING_FACE_HUB_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          openenv push -r rishi38/Emergency_service_environment
+          openenv push -r rishi38/smart_emergency
