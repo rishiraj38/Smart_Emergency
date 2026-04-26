@@ -486,6 +486,16 @@ Key insight: we store the **random seed** with each training example so we can d
 
 ## Results
 
+### SFT Training — Loss Curve
+
+![SFT Loss Curve](./public/sft_loss_curve.png)
+*SFT loss drops as the model learns the JSON dispatch format from expert demonstrations.*
+
+### GRPO Training — Reward, Loss, KL, Reward Std
+
+![GRPO Training Curves](./public/grpo_training_curve.png)
+*GRPO reward climbs from negative to positive as the agent learns better dispatch strategies.*
+
 ### Training Metrics
 
 Our GRPO training shows the expected learning curve:

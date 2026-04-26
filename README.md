@@ -23,8 +23,9 @@ tags:
 |----------|------|
 | 🌐 **Live Environment (HF Space)** | [https://rishi38-smart-emergency.hf.space/web](https://rishi38-smart-emergency.hf.space/web) |
 | 🤖 **Trained Model (HF Hub)** | [rishi38/smart-emergency-grpo](https://huggingface.co/rishi38/smart-emergency-grpo) |
-| 📓 **Training Notebook** | [train_sft_grpo_graph.ipynb](./train_sft_grpo_graph.ipynb) |
-| 📝 **Blog / Writeup** | [blog.md](./blog.md) |
+| 📓 **Training Notebook** | [train_sft_grpo_graph.ipynb](https://colab.research.google.com/drive/1e48Y9LWgkA3lvj8Ir8GA2xJ3BTKQxWkC?usp=sharing) |
+| 🎬 **Demo (Colab)** | [DEMO](https://colab.research.google.com/drive/1DQr-NHgTrRCJvBqfpUW56HO4EipoapUN?usp=sharing) |
+| 📝 **Blog / Writeup** | [blog.md](https://huggingface.co/spaces/rishi38/Emergency_service_environment/blob/main/blog.md) |
 | 💻 **GitHub Repository** | [rishiraj38/Smart_Emergency](https://github.com/rishiraj38/Smart_Emergency) |
 
 ---
@@ -179,15 +180,15 @@ Improve dispatch strategy by training against the live environment with real rew
 
 ### SFT Training Loss Curve
 
-<!-- TODO: Add SFT loss curve image after training -->
-<!-- ![SFT Loss Curve](./sft_loss_curve.png) -->
-> 📷 **SFT Loss Curve** — *Add `sft_loss_curve.png` here after training*
+*Phase 1: SFT loss drops as the model learns the JSON dispatch format from expert demonstrations.*
+
+![SFT Loss Curve](./public/sft_loss_curve.png)
 
 ### GRPO Training Dashboard (Reward, Loss, KL, Reward Std)
 
-<!-- TODO: Add GRPO training curves image after training -->
-<!-- ![GRPO Training Curves](./grpo_training_curves.png) -->
-> 📷 **GRPO Training Curves** — *Add `grpo_training_curves.png` here after training*
+*Phase 2: GRPO reward climbs from negative to positive as the agent discovers better dispatch strategies through environment interaction.*
+
+![GRPO Training Curves](./public/grpo_training_curve.png)
 
 ### Metrics Summary
 
@@ -221,6 +222,74 @@ The GRPO training curve shows the expected RL learning pattern:
 | Reroute reasoning | ❌ Never attempted | ✅ Low→high severity redirect |
 
 ---
+
+## 🎬 Live Demo — Trained Agent in Action
+
+Below is a real 3-step excerpt from the GRPO-trained model dispatching against the live environment (Task 2 — Medium difficulty):
+
+### Step 1 — Medical Emergency
+
+**Incoming call:**
+> *"Someone's not breathing at Riverside Market! A bystander is doing CPR. Please send an ambulance immediately!"*
+
+**Model output:**
+```json
+{
+  "action_type": "dispatch",
+  "severity_pred": 4,
+  "is_duplicate": false,
+  "vehicle_type": "ambulance",
+  "vehicle_id": "ambulance_0",
+  "reroute": null
+}
+```
+
+**Reward:** `severity: +0.6 | duplicate: +1.0 | vehicle_type: +1.5 | vehicle_choice: +0.8 | reroute: 0.0` → **raw: +3.9, adjusted: +1.4** ✅
+
+> The model correctly identifies this as a medical emergency (severity 4), picks an ambulance, and dispatches the nearest free unit.
+
+### Step 2 — Duplicate Call Detected
+
+**Incoming call:**
+> *"There's a person collapsed near the market on Riverside! Nobody's helping, hurry!"*
+
+**Model output:**
+```json
+{
+  "action_type": "duplicate",
+  "severity_pred": 4,
+  "is_duplicate": true,
+  "duplicate_of_event_id": "EVT-0001",
+  "vehicle_type": null,
+  "vehicle_id": null,
+  "reroute": null
+}
+```
+
+**Reward:** `severity: +1.0 | duplicate: +1.5 | vehicle_type: 0.0 | vehicle_choice: 0.0 | reroute: 0.0` → **raw: +2.5, adjusted: 0.0** ✅
+
+> The model recognizes this is the same Riverside Market emergency from Step 1 and correctly flags it as a duplicate with the right event ID — saving an ambulance for the next real emergency.
+
+### Step 3 — Fire, All Units Busy → Hold
+
+**Incoming call:**
+> *"Building's on fire on Oak Street near the mall! People are yelling from the windows!"*
+
+**Model output:**
+```json
+{
+  "action_type": "hold",
+  "severity_pred": 4,
+  "is_duplicate": false,
+  "vehicle_type": "fire",
+  "vehicle_id": "fire_0",
+  "reroute": null
+}
+```
+
+**Reward:** `severity: +0.6 | duplicate: +1.0 | vehicle_type: +1.5 | vehicle_choice: +1.3 | reroute: 0.0` → **raw: +4.4, adjusted: +1.9** ✅
+
+> Both fire trucks are busy. Instead of hallucinating a vehicle ID or dispatching a police car, the model correctly uses `hold` — queueing behind the fire truck with the soonest ETA.
 
 ## 💡 Why It Matters
 
@@ -261,9 +330,9 @@ Building a reward function that *actually teaches* and can't be gamed was one of
 
 ### 4. Duplicate Reward Gaming — Always Saying "Not Duplicate"
 
-**Problem:** Since most calls genuinely aren't duplicates, always predicting `is_duplicate: false` was a free +1.0 almost every time — a reward hack.
+**Problem:** Since most calls genuinely aren't duplicates, always predicting `is_duplicate: false` gave a free +1.0 almost every time — the agent could game this.
 
-**Fix:** Removed the +1.0 baseline for non-duplicate calls. Now: correct non-duplicate = **0.0** (neutral), correct duplicate detection = **+1.5** (reward), missed duplicate = **-1.0** (penalty). No free points.
+**Fix:** The **baseline subtraction** (Challenge #1) absorbs this. The +1.0 for correct non-duplicate is expected — it's already priced into the 2.5 baseline. Meanwhile, missing a real duplicate costs **-1.0** and a false positive costs **-0.8**, so the agent can't ignore duplicates. Correct duplicate detection with the right event ID gives **+1.5** — the highest single-component reward — incentivizing active detection.
 
 ### 5. Severity Reward Too Lenient — Agent Gets Partial Credit for Bad Guesses
 
