@@ -62,7 +62,7 @@ class SmartEmergencyEnvironment(Environment):
     def reset(self, task_id: int = 1, seed: Optional[int] = None) -> SmartEmergencyObservation:
         self._seed = seed if seed is not None else random.randint(0, 999999)
         self._rng = random.Random(self._seed)
-        self._city = generate_city(self._seed)
+        self._city = generate_city(self._seed, difficulty=task_id)
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._active_events = {}
         self._event_counter = 1
@@ -80,10 +80,10 @@ class SmartEmergencyEnvironment(Environment):
             self._duplicate_prob = 0.10
         elif task_id == 2:
             self._max_steps = 15
-            self._duplicate_prob = 0.50
+            self._duplicate_prob = 0.30
         else:
             self._max_steps = 20
-            self._duplicate_prob = 0.30
+            self._duplicate_prob = 0.50
 
         # Generate first call
         self._current_call, self._event_counter = generate_call(

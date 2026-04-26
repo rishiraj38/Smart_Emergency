@@ -63,21 +63,21 @@ def tasks():
                 "id": 1,
                 "name": "Basic Dispatch",
                 "difficulty": "easy",
-                "description": "Low-volume calls, fewer active events. Focus on severity and vehicle type.",
+                "description": "10 steps, 3 vehicles per type, 10% duplicates. Focus on severity and vehicle type.",
                 "reward_max": 6.7,
             },
             {
                 "id": 2,
-                "name": "Duplicate Detection",
+                "name": "Scarce Resources",
                 "difficulty": "medium",
-                "description": "Higher duplicate rate. Agent must correlate repeat callers to existing events.",
+                "description": "15 steps, 2 vehicles per type, 30% duplicates. Must handle holds and pick nearest units.",
                 "reward_max": 6.7,
             },
             {
                 "id": 3,
                 "name": "Full Disaster Response",
                 "difficulty": "hard",
-                "description": "High call volume, scarce vehicles, reroutes required. Full 20-step episode.",
+                "description": "20 steps, 1 vehicle per type, 50% duplicates. Requires reroutes and optimal triage.",
                 "reward_max": 6.7,
             },
         ]
@@ -116,21 +116,24 @@ def grader():
     # Aggregate per-component averages
     keys = ["severity", "duplicate", "vehicle_type", "vehicle_choice", "reroute", "total"]
     component_totals = {k: 0.0 for k in keys}
+    raw_cumulative = 0.0
     for breakdown in history:
         for k in keys:
             component_totals[k] += breakdown.get(k, 0.0)
+        raw_cumulative += breakdown.get("raw_total", breakdown.get("total", 0.0))
 
     n = max(1, len(history))
     component_avgs = {k: round(v / n, 4) for k, v in component_totals.items()}
     cumulative = round(component_totals["total"], 4)
 
-    # Normalize: theoretical max ~6.7 per step, floor at 0
+    # Normalize using raw total (before baseline subtraction) for a fair 0–1 score
     MAX_PER_STEP = 6.7
-    score = round(max(0.0, min(1.0, cumulative / (MAX_PER_STEP * n))), 4)
+    score = round(max(0.0, min(1.0, raw_cumulative / (MAX_PER_STEP * n))), 4)
 
     return {
         "score": score,
         "cumulative_reward": cumulative,
+        "raw_cumulative_reward": round(raw_cumulative, 4),
         "steps": steps,
         "episode_id": SmartEmergencyEnvironment.latest_episode_id,
         "reward_components": {
@@ -235,7 +238,7 @@ def baseline():
             action = _rule_agent(env, obs)
             try:
                 obs = env.step(action)
-                total_reward += obs.reward_breakdown.get("total", 0.0)
+                total_reward += obs.reward_breakdown.get("raw_total", obs.reward_breakdown.get("total", 0.0))
             except Exception:
                 break
             steps += 1
