@@ -9,6 +9,12 @@ SEVERITY_REWARDS = {0: 1.0, 1: 0.6, 2: 0.2, 3: -0.2, 4: -0.5}
 PARSE_FAILURE_PENALTY = -2.0
 MAX_TRAVEL_TIME = 15.0
 
+# Baseline reward subtracted from each step's total so that an
+# untrained / SFT-only agent starts near 0 and the GRPO training curve
+# shows the expected upward trend.  Calibrated to the average per-step
+# score of a keyword-heuristic agent (~2.5).
+STEP_REWARD_BASELINE = 2.5
+
 
 def compute_reward(
     *,
@@ -136,6 +142,8 @@ def compute_reward(
             r -= 0.3
         breakdown["reroute"] = r
 
-    breakdown["total"] = sum(breakdown.values())
+    raw = sum(breakdown.values())
+    breakdown["raw_total"] = raw
+    breakdown["total"] = raw - STEP_REWARD_BASELINE
     return breakdown
 

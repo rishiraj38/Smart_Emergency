@@ -82,8 +82,13 @@ def _make_street(rng: random.Random) -> str:
     return f"{rng.choice(STREET_NAMES)} {rng.choice(SUFFIXES)}"
 
 
-def generate_city(seed: int) -> City:
-    """Build a random city graph, spawn vehicles, return City."""
+def generate_city(seed: int, difficulty: int = 1) -> City:
+    """Build a random city graph, spawn vehicles, return City.
+
+    Args:
+        seed: Random seed for reproducibility.
+        difficulty: 1 = easy (plenty of vehicles), 2 = medium, 3 = hard (scarce).
+    """
     rng = random.Random(seed)
     city = City(seed=seed)
 
@@ -153,7 +158,17 @@ def generate_city(seed: int) -> City:
             city.edges[closest][uid] = d
             visited.add(uid)
 
-    # ── 4. Spawn vehicles ────────────────────────────────────────────────
+    # ── 4. Spawn vehicles (count scales with difficulty) ──────────────────
+    # Easy (1): 3 per type — always a free unit available
+    # Medium (2): 2 per type — sometimes all busy, must use hold
+    # Hard (3): 1 per type — forces hold/reroute decisions constantly
+    if difficulty <= 1:
+        vehicle_count = 3
+    elif difficulty == 2:
+        vehicle_count = 2
+    else:
+        vehicle_count = 1
+
     def _find_node(ntype: str) -> str:
         for nid, n in city.nodes.items():
             if n.node_type == ntype:
@@ -161,13 +176,13 @@ def generate_city(seed: int) -> City:
         return node_ids[0]
 
     vid = 0
-    for vtype, home_type, count in [
-        ("police", "police_station", rng.randint(2, 3)),
-        ("ambulance", "hospital", rng.randint(2, 3)),
-        ("fire", "fire_station", rng.randint(2, 3)),
+    for vtype, home_type in [
+        ("police", "police_station"),
+        ("ambulance", "hospital"),
+        ("fire", "fire_station"),
     ]:
         home = _find_node(home_type)
-        for _ in range(count):
+        for _ in range(vehicle_count):
             city.vehicles.append(Vehicle(
                 unit_id=f"{vtype}_{vid}",
                 vehicle_type=vtype,
