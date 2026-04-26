@@ -25,7 +25,7 @@ tags:
 | 🤖 **Trained Model (HF Hub)** | [rishi38/smart-emergency-grpo](https://huggingface.co/rishi38/smart-emergency-grpo) |
 | 📓 **Training Notebook** | [train_sft_grpo_graph.ipynb](https://colab.research.google.com/drive/1e48Y9LWgkA3lvj8Ir8GA2xJ3BTKQxWkC?usp=sharing) |
 | 🎬 **Demo (Colab)** | [DEMO](https://colab.research.google.com/drive/1DQr-NHgTrRCJvBqfpUW56HO4EipoapUN?usp=sharing) |
-| 📝 **Blog / Writeup** | [blog.md](https://huggingface.co/spaces/rishi38/Emergency_service_environment/blob/main/blog.md) |
+| 📝 **Blog / Writeup** | [blog.md](https://huggingface.co/spaces/rishi38/smart_emergency/blob/main/blog.md) |
 | 💻 **GitHub Repository** | [rishiraj38/Smart_Emergency](https://github.com/rishiraj38/Smart_Emergency) |
 
 ---
